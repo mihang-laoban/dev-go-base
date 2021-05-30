@@ -1,0 +1,7 @@
+[db]
+    [db.mysql]
+        host='172.27.0.1'
+        port=3308
+        user='root'
+        password='123'
+        database='test'
