@@ -17,7 +17,6 @@ func TestJd(t *testing.T) {
 }
 
 func TestServer(t *testing.T) {
-	//db.Init()
 	server := server2.NewServer()
 	server.POST("/getTableNames", router.GetTableNames)
 	server.POST("/generateData", router.GenerateData)
