@@ -4,12 +4,23 @@ import (
 	"dev-go-base/biz"
 	"dev-go-base/common"
 	"dev-go-base/db"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"net/http"
 )
 
 func GetTableNames(c *gin.Context) {
-	d := db.NewDb("r")
+	d, err := db.NewDb("s")
+	common.ErrorHandling(err)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "Failure",
+			"data":    fmt.Sprintf("Origin: %T - %v", errors.Cause(err), errors.Cause(err)),
+		})
+		return
+	}
 	tbl := d.GetAllTableNames()
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
@@ -43,4 +54,29 @@ func GenerateData(c *gin.Context) {
 		"message": "Success",
 		"data":    "",
 	})
+}
+
+func SetDb(c *gin.Context)  {
+	type Req struct {
+		User, Password, Host, Database string
+		Port      int
+	}
+	var req Req
+	if err := c.ShouldBindJSON(&req); err != nil {
+		common.ErrorHandling(err)
+	}
+	db.NewConFromReq(req.User, req.Password, req.Host, req.Database, req.Port)
+	if db.Cons["s"] == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "Failure",
+			"data":    "",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "Success",
+			"data":    "",
+		})
+	}
 }

@@ -111,8 +111,11 @@ func (db *MyDb) Deletion() {
 	db.Delete(&product, 1)
 }
 
-func NewDb(dbName string) *MyDb {
-	return Cons[dbName]
+func NewDb(dbName string) (*MyDb, error) {
+	if Cons[dbName] == nil {
+		return nil, errors.New(fmt.Sprintf("%s", "Database should be initiated first."))
+	}
+	return Cons[dbName], nil
 }
 
 func getConfig(confFileName, postfix, confPath string) DbConfig {
@@ -133,7 +136,12 @@ func initDb() {
 		dbConf.Db.Mysql.Port,
 		dbConf.Db.Mysql.Database,
 	)
+	db := NewDbConn(dsn)
 
+	Cons["r"] = &MyDb{db}
+}
+
+func NewDbConn(dsn string) *gorm.DB {
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                       dsn,   // data source name
 		DefaultStringSize:         256,   // default size for string fields
@@ -148,8 +156,21 @@ func initDb() {
 	if d, err := db.DB(); err != nil {
 		d.SetConnMaxLifetime(time.Second * 3)
 	}
+	return db
+}
 
-	Cons["r"] = &MyDb{db}
+func NewConFromReq(user, password, host, database string, port int){
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		user,
+		password,
+		host,
+		port,
+		database,
+	)
+
+	db := NewDbConn(dsn)
+
+	Cons["s"] = &MyDb{db}
 }
 
 func Init() {

@@ -7,7 +7,8 @@ import (
 )
 
 func Seeder(tblName string) bool {
-	d := db.NewDb("r")
+	d, err := db.NewDb("s")
+	common.ErrorHandling(err)
 	rows, _ := d.GetAllCols(tblName)
 
 	f := fmt.Sprintf("INSERT INTO %s (", tblName)
@@ -28,17 +29,23 @@ func Seeder(tblName string) bool {
 		}
 		// todo 可以由请求参数修改长度
 		lenLimit, _ := common.NumGetter(rows[i].ColType)
+		var limit int
+		if lenLimit == 0 {
+			limit = 5
+		}else {
+			limit = lenLimit/2
+		}
 
 		switch rows[i].DataType {
-		case "int":
-			tmpNum := common.GetRandomString(lenLimit/2, common.Digit)
+		case "int", "double":
+			tmpNum := common.GetRandomString(limit, common.Digit)
 			if i == rowLen-1 {
 				values += fmt.Sprintf("'%s'", tmpNum)
 			} else {
 				values += fmt.Sprintf("'%s', ", tmpNum)
 			}
 		case "varchar":
-			tmpStr := common.GetRandomString(lenLimit/2, common.LowChar, common.HighChar)
+			tmpStr := common.GetRandomString(limit, common.LowChar, common.HighChar)
 			if i == rowLen-1 {
 				values += fmt.Sprintf("'%s'", tmpStr)
 			} else {
