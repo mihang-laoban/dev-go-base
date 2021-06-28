@@ -1,6 +1,6 @@
 [db]
     [db.mysql]
-        host='172.27.0.1'
+        host='docker'
         port=3308
         user='root'
         password='123'

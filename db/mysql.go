@@ -128,7 +128,7 @@ func getConfig(confFileName, postfix, confPath string) DbConfig {
 }
 
 func initDb() {
-	dbConf := getConfig("db", "toml", "../conf/")
+	dbConf := getConfig("db", "toml", "conf/")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 		dbConf.Db.Mysql.User,
 		dbConf.Db.Mysql.Password,
@@ -159,7 +159,7 @@ func NewDbConn(dsn string) *gorm.DB {
 	return db
 }
 
-func NewConFromReq(user, password, host, database string, port int){
+func NewConFromReq(user, password, host, database string, port int) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 		user,
 		password,

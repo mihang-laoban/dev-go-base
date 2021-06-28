@@ -56,14 +56,20 @@ func GenerateData(c *gin.Context) {
 	})
 }
 
-func SetDb(c *gin.Context)  {
+func SetDb(c *gin.Context) {
 	type Req struct {
 		User, Password, Host, Database string
-		Port      int
+		Port                           int
 	}
 	var req Req
 	if err := c.ShouldBindJSON(&req); err != nil {
 		common.ErrorHandling(err)
+		c.JSON(http.StatusOK, gin.H{
+			"code":    1000,
+			"message": "Failure",
+			"data":    "Check your parameters first, please",
+		})
+		return
 	}
 	db.NewConFromReq(req.User, req.Password, req.Host, req.Database, req.Port)
 	if db.Cons["s"] == nil {
